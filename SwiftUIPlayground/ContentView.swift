@@ -3,6 +3,7 @@ import SwiftUI
 struct ContentView: View {
     
     @State private var user: GitHubUser?
+    @State private var repo: GitHubRepo?
     
     var body: some View {
         VStack(spacing: 20) {
@@ -21,7 +22,13 @@ struct ContentView: View {
                 .bold()
                 .font(.title3)
             
-            Text(user?.bio ?? "Bio Placeholder")
+            Text(user?.bio ?? "No bio")
+                .padding()
+            
+            Text("Repo: \(repo?.name ?? "")")
+                .padding()
+            
+            Text("Repo watchers: \(repo?.watchersCount ?? 0)")
                 .padding()
             
             Spacer()
@@ -29,7 +36,8 @@ struct ContentView: View {
         .padding()
         .task {
             do {
-                user = try await getUser()
+                user = try await getGitHubObject(from: "https://api.github.com/users/lyahdav")
+                repo = try await getGitHubObject(from: "https://api.github.com/repos/lyahdav/ai-invoice-uploader")
             } catch GHError.invalidURL {
                 print("invalid URL")
             } catch GHError.invalidResponse {
@@ -42,9 +50,7 @@ struct ContentView: View {
         }
     }
     
-    func getUser() async throws -> GitHubUser {
-        let endpoint = "https://api.github.com/users/lyahdav"
-        
+    func getGitHubObject<T: Decodable>(from endpoint: String) async throws -> T {
         guard let url = URL(string: endpoint) else {
             throw GHError.invalidURL
         }
@@ -58,8 +64,9 @@ struct ContentView: View {
         do {
             let decoder = JSONDecoder()
             decoder.keyDecodingStrategy = .convertFromSnakeCase
-            return try decoder.decode(GitHubUser.self, from: data)
+            return try decoder.decode(T.self, from: data)
         } catch {
+            print("Error: \(error)")
             throw GHError.invalidData
         }
     }
@@ -69,6 +76,11 @@ struct GitHubUser: Codable {
     let login: String
     let avatarUrl: String
     let bio: String?
+}
+
+struct GitHubRepo: Codable {
+    let watchersCount: Int
+    let name: String
 }
 
 enum GHError: Error {
