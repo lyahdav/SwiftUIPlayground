@@ -7,17 +7,17 @@ class TodoListViewModel {
     @ObservationIgnored @AppStorage("highestTaskId") private var highestTaskId: Int = 0
     @ObservationIgnored @AppStorage("taskData") private var taskData: Data = Data()
     
-    var tasks: [Task] = []
+    var tasks: [Int: Task] = [:]
 
     init() {
         tasks = getTasksFromStorage()
     }
 
-    private func getTasksFromStorage() -> [Task] {
-        if let tasks = try? JSONDecoder().decode([Task].self, from: taskData) {
+    private func getTasksFromStorage() -> [Int: Task] {
+        if let tasks = try? JSONDecoder().decode([Int: Task].self, from: taskData) {
             return tasks
         }
-        return [] // If cannot decode, return empty list
+        return [:] // If cannot decode, return none
     }
     
     private func saveTasksToStorage() {
@@ -33,25 +33,28 @@ class TodoListViewModel {
     
     func addTask(newTaskTitle: String, numTasksToAdd: Int) {
         for _ in 0..<numTasksToAdd {
-            tasks.append(Task(id: highestTaskId, title: newTaskTitle, description: ""))
+            tasks[highestTaskId] = Task(id: highestTaskId, title: newTaskTitle, description: "")
             highestTaskId += 1
             saveTasksToStorage()
         }
     }
     
     func deleteTask(_ task: Task) {
-        // TODO: Avoid O(n) operation
-        tasks.removeAll { $0.id == task.id }
+        tasks.removeValue(forKey: task.id)
         saveTasksToStorage()
     }
     
     func updateTask(taskId: Int, title: String, description: String) {
-        // TODO: Avoid O(n)
-        if let index = tasks.firstIndex(where: { $0.id == taskId }) {
-            tasks[index].title = title
-            tasks[index].description = description
+        if var task = tasks[taskId] {
+            task.title = title
+            task.description = description
+            tasks[taskId] = task
             saveTasksToStorage()
         }
+    }
+    
+    func getSortedTasks() -> [Task] {
+        return tasks.values.sorted { $0.id < $1.id }
     }
 }
 
@@ -111,7 +114,7 @@ struct TodoListView: View {
 
     var body: some View {
         NavigationStack {
-            List(viewModel.tasks) { task in
+            List(viewModel.getSortedTasks()) { task in
                 TaskCellView(task: task) {
                     viewModel.deleteTask(task)
                 }
