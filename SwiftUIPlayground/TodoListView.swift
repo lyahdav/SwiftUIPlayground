@@ -117,7 +117,6 @@ struct TodoListView: View {
                 }
             }
             .scrollDismissesKeyboard(.interactively)
-            // TODO: Extract view
             TaskComposer()
         }
         .environment(viewModel)
