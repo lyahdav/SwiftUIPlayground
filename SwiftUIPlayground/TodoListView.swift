@@ -8,8 +8,6 @@ class TodoListViewModel {
     @ObservationIgnored @AppStorage("taskData") private var taskData: Data = Data()
     
     var tasks: [Task] = []
-    var newTaskTitle: String = ""
-    var numTasksToAdd: Int = 1
 
     init() {
         tasks = getTasksFromStorage()
@@ -33,7 +31,7 @@ class TodoListViewModel {
         taskData = encodedTasks
     }
     
-    func addTask() {
+    func addTask(newTaskTitle: String, numTasksToAdd: Int) {
         for _ in 0..<numTasksToAdd {
             tasks.append(Task(id: highestTaskId, title: newTaskTitle, description: ""))
             highestTaskId += 1
@@ -120,30 +118,40 @@ struct TodoListView: View {
             }
             .scrollDismissesKeyboard(.interactively)
             // TODO: Extract view
-            HStack {
-                TextField("New task", text: $viewModel.newTaskTitle)
-                let isTitleEmpty = viewModel.newTaskTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                Button("Add") {
-                    viewModel.addTask()
-                }
-                .disabled(isTitleEmpty)
-                Picker("Choose a number", selection: $viewModel.numTasksToAdd) {
-                    ForEach(1...10, id: \.self) { number in
-                        Text("\(number)").tag(number)
-                    }
-                }
-                .pickerStyle(.wheel)
-                .frame(height: 45)
-                Text("time".pluralized(for: viewModel.numTasksToAdd))
-                    .frame(maxWidth: 100)
-            }
-            .padding()
-            .navigationTitle("Todo List")
-            .navigationDestination(for: Task.self) { task in
-                TaskDetailView(task: task)
-            }
+            TaskComposer()
         }
         .environment(viewModel)
+    }
+}
+
+struct TaskComposer: View {
+    @Environment(TodoListViewModel.self) private var viewModel
+    @State private var newTaskTitle: String = ""
+    @State private var numTasksToAdd: Int = 1
+
+    var body: some View {
+        HStack {
+            TextField("New task", text: $newTaskTitle)
+            let isTitleEmpty = newTaskTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+            Button("Add") {
+                viewModel.addTask(newTaskTitle: newTaskTitle, numTasksToAdd: numTasksToAdd)
+            }
+            .disabled(isTitleEmpty)
+            Picker("Choose a number", selection: $numTasksToAdd) {
+                ForEach(1...10, id: \.self) { number in
+                    Text("\(number)").tag(number)
+                }
+            }
+            .pickerStyle(.wheel)
+            .frame(height: 45)
+            Text("time".pluralized(for: numTasksToAdd))
+                .frame(maxWidth: 100)
+        }
+        .padding()
+        .navigationTitle("Todo List")
+        .navigationDestination(for: Task.self) { task in
+            TaskDetailView(task: task)
+        }
     }
 }
 
