@@ -1,51 +1,76 @@
 import SwiftUI
+internal import Combine
 
 struct ContentView: View {
     
     @State private var user: GitHubUser?
     @State private var repo: GitHubRepo?
+    @State private var isNight = false
     
     var body: some View {
-        VStack(spacing: 20) {
-            AsyncImage(url: URL(string: user?.avatarUrl ?? "")) { image in
-                image
-                    .resizable()
-                    .scaledToFit().aspectRatio(contentMode: .fit)
-                    .clipShape(Circle())
-            } placeholder: {
-                Circle()
-                    .foregroundColor(.secondary)
+        ZStack {
+            ContainerRelativeShape()
+                .fill(Color.blue.gradient)
+                .ignoresSafeArea()
+            
+            VStack(spacing: 20) {
+                AsyncImage(url: URL(string: user?.avatarUrl ?? "")) { image in
+                    image
+                        .resizable()
+                        .scaledToFit().aspectRatio(contentMode: .fit)
+                        .clipShape(Circle())
+                } placeholder: {
+                    Circle()
+                        .foregroundColor(.secondary)
+                }
+                .frame(width: 120, height: 120)
+                
+                Text(user?.login ?? "Login Placeholder")
+                    .bold()
+                    .font(.title3)
+                
+                Text(user?.bio ?? "No bio")
+                    .padding()
+                
+                Text("Repo: \(repo?.name ?? "")")
+                    .padding()
+                
+                Text("Repo watchers: \(repo?.watchersCount ?? 0)")
+                    .padding()
+                
+                Button("Tap me!") {
+                    print("button tapped")
+                    isNight.toggle()
+                }
+                
+                ChildView(isNight: isNight)
+                
+                Text("TextLast")
+                    .background(.blue)
+                    .cornerRadius(3)
+                    .padding(.bottom, 10)
+
+                Rectangle()
+                    .fill(.red.gradient)
+                    .frame(width: 200, height: 70)
+                
+                TimerView()
+                
             }
-            .frame(width: 120, height: 120)
-            
-            Text(user?.login ?? "Login Placeholder")
-                .bold()
-                .font(.title3)
-            
-            Text(user?.bio ?? "No bio")
-                .padding()
-            
-            Text("Repo: \(repo?.name ?? "")")
-                .padding()
-            
-            Text("Repo watchers: \(repo?.watchersCount ?? 0)")
-                .padding()
-            
-            Spacer()
-        }
-        .padding()
-        .task {
-            do {
-                user = try await getGitHubObject(from: "https://api.github.com/users/lyahdav")
-                repo = try await getGitHubObject(from: "https://api.github.com/repos/lyahdav/ai-invoice-uploader")
-            } catch GHError.invalidURL {
-                print("invalid URL")
-            } catch GHError.invalidResponse {
-                print("invalid response")
-            } catch GHError.invalidData {
-                print("invalid data")
-            } catch {
-                print("Unexpected error")
+            .padding()
+            .task {
+                do {
+                    user = try await getGitHubObject(from: "https://api.github.com/users/lyahdav")
+                    repo = try await getGitHubObject(from: "https://api.github.com/repos/lyahdav/ai-invoice-uploader")
+                } catch GHError.invalidURL {
+                    print("invalid URL")
+                } catch GHError.invalidResponse {
+                    print("invalid response")
+                } catch GHError.invalidData {
+                    print("invalid data")
+                } catch {
+                    print("Unexpected error: \(error)")
+                }
             }
         }
     }
@@ -69,6 +94,41 @@ struct ContentView: View {
             print("Error: \(error)")
             throw GHError.invalidData
         }
+    }
+}
+
+class TimerViewModel: ObservableObject {
+    @Published var seconds = 0
+    
+    init() {
+        // Start a timer that increments every second
+        Timer.scheduledTimer(withTimeInterval: 1, repeats: true) { _ in
+            self.seconds += 1
+        }
+    }
+}
+
+struct TimerLabel: View {
+    @ObservedObject var viewModel: TimerViewModel
+    
+    var body: some View {
+        Text("Seconds: \(viewModel.seconds)")
+    }
+}
+
+struct TimerView: View {
+    @StateObject private var viewModel = TimerViewModel()
+    
+    var body: some View {
+        TimerLabel(viewModel: viewModel) // ✅ Pass down
+    }
+}
+
+struct ChildView: View {
+    let isNight: Bool
+    
+    var body: some View {
+        Text(isNight ? "night" : "day")
     }
 }
 
