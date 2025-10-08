@@ -144,9 +144,11 @@ struct TodoListView: View {
                 TaskComposer()
             }
   
+            // TODO: Extract
             if let toastText = viewModel.toastText, let toastImageName = viewModel.toastImageName {
                 VStack {
                     Spacer()
+                    // TODO: Fix toast colors in dark mode
                     Label(toastText, systemImage: toastImageName)
                         .padding()
                         .background(Color.black.opacity(0.8))
