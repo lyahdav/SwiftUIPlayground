@@ -96,12 +96,12 @@ struct TaskDetailView: View {
     }
     
     var body: some View {
-        // TODO: Improve layout, add labels
-        VStack {
+        // TODO: Add delete button
+        // TODO: Add created at date/time
+        Form {
             TextField("Title", text: $title)
-                .padding()
-            TextField("Description", text: $description)
-                .padding()
+            TextField("Description", text: $description, axis: .vertical)
+            
         }
         .navigationTitle("Task")
         .onDisappear {
