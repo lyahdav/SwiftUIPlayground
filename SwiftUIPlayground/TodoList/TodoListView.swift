@@ -115,7 +115,7 @@ struct Toast {
     let imageName: String
     let foregroundColor: Color
     
-    init(text: String, imageName: String, foregroundColor: Color = Color(.systemBackground)) {
+    init(text: String, imageName: String, foregroundColor: Color = .primary) {
         self.text = text
         self.imageName = imageName
         self.foregroundColor = foregroundColor
@@ -147,10 +147,9 @@ struct ToastView: View {
     var body: some View {
         VStack {
             Spacer()
-            // TODO: Fix toast colors in dark mode
             Label(toast.text, systemImage: toast.imageName)
                 .padding()
-                .background(Color.black.opacity(0.8))
+                .background(.regularMaterial)
                 .foregroundColor(toast.foregroundColor)
                 .cornerRadius(8)
                 .padding(.bottom, 100)
