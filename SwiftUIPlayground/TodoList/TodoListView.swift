@@ -104,8 +104,9 @@ struct TaskDetailView: View {
         }
         .navigationTitle("Task")
         .onDisappear {
-            // TODO: Only call if values changed
-            viewModel.updateTask(taskId: task.id, title: title, description: description)
+            if title != task.title || description != task.description {
+                viewModel.updateTask(taskId: task.id, title: title, description: description)
+            }
         }
     }
 }
@@ -232,4 +233,3 @@ extension String {
         return count == 1 ? self : self + "s"
     }
 }
-
