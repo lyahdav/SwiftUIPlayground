@@ -11,7 +11,6 @@ struct ChatView: View {
         Message(text: "Hello! How can I help you today?", isSentByUser: false),
         Message(text: "Can you tell me a joke?", isSentByUser: true),
         Message(text: "Sure! Why don’t scientists trust atoms? Because they make up everything!", isSentByUser: false),
-        Message(text: "Can you tell me another joke?", isSentByUser: true),
     ]
     
     @State private var currentInput: String = ""
