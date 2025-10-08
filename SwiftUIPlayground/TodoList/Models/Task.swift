@@ -7,5 +7,5 @@ struct Task: Identifiable, Codable, Hashable {
     let createdAt: Date
     var modifiedAt: Date
     
-    static let exampleTask = Task(id: 1, title: "Task Title", description: "Task Description", createdAt: Date(), modifiedAt: Date())
+    static let exampleTask = Task(id: 1, title: "Task Title", description: "Task Description", createdAt: Calendar.current.date(byAdding: .day, value: -1, to: Date()) ?? Date(), modifiedAt: Date())
 }
