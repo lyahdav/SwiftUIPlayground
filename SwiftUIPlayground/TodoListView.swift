@@ -123,6 +123,7 @@ struct TaskDetailView: View {
         }
         .navigationTitle("Task")
         .onDisappear {
+            // TODO: Only call if values changed
             viewModel.updateTask(taskId: task.id, title: title, description: description)
         }
     }
