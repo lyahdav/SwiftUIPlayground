@@ -143,18 +143,6 @@ struct TodoListView: View {
                 TaskComposer()
             }
   
-            // TODO
-//            VStack {
-//                Spacer()
-//                Label("A", systemImage: "exclamationmark.triangle.fill")
-//                    .padding()
-//                    .background(Color.black.opacity(0.8))
-//                    .foregroundColor(.yellow)
-//                    .cornerRadius(8)
-//                    .padding(.bottom, 100)
-//                    .transition(.move(edge: .bottom).combined(with: .opacity))
-//            }
-            
             if let toastText = viewModel.toastText {
                 VStack {
                     Spacer()
