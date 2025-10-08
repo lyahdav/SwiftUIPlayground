@@ -24,12 +24,11 @@ class TodoListViewModel {
     
     private func saveTasksToStorage() {
         guard let encodedTasks = try? JSONEncoder().encode(tasks) else {
-            // TODO: Have a way to test what this looks like in preview
-            toastManager.showToast("Error saving tasks!", imageName: "exclamationmark.triangle.fill", foregroundColor: .yellow)
+            toastManager.showToast(Toast.errorSavingToast)
             return
         }
         taskData = encodedTasks
-        toastManager.showToast("Tasks saved", imageName: "checkmark.square.fill")
+        toastManager.showToast(Toast.successSavingToast)
     }
     
     func addTask(newTaskTitle: String, numTasksToAdd: Int) {
@@ -111,42 +110,48 @@ struct TaskDetailView: View {
     }
 }
 
+struct Toast {
+    let text: String
+    let imageName: String
+    let foregroundColor: Color
+    
+    init(text: String, imageName: String, foregroundColor: Color = Color(.systemBackground)) {
+        self.text = text
+        self.imageName = imageName
+        self.foregroundColor = foregroundColor
+    }
+    
+    static let errorSavingToast = Toast(text: "Error saving tasks!", imageName: "exclamationmark.triangle.fill", foregroundColor: .yellow)
+    static let successSavingToast = Toast(text: "Tasks saved", imageName: "checkmark.square.fill")
+}
+
 @Observable
 class ToastManager {
-    // TODO: Wrap in struct?
-    var toastText: String?
-    var toastImageName: String?
-    var toastForegroundColor: Color = Color(.systemBackground)
-
-    // TODO: Avoid having to repeat default color here
-    func showToast(_ text: String, imageName: String, foregroundColor: Color = Color(.systemBackground)) {
+    var currentToast: Toast?
+    
+    func showToast(_ toast: Toast) {
         withAnimation {
-            toastText = text
-            toastImageName = imageName
-            toastForegroundColor = foregroundColor
+            currentToast = toast
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
             withAnimation { [weak self] in
-                self?.toastText = nil
-                self?.toastImageName = nil
+                self?.currentToast = nil
             }
         }
     }
 }
 
 struct ToastView: View {
-    let text: String
-    let imageName: String
-    let foregroundColor: Color
+    let toast: Toast
     
     var body: some View {
         VStack {
             Spacer()
             // TODO: Fix toast colors in dark mode
-            Label(text, systemImage: imageName)
+            Label(toast.text, systemImage: toast.imageName)
                 .padding()
-                .background(Color.black.opacity(0.8))
-                .foregroundColor(foregroundColor)
+                .background(.primary)
+                .foregroundColor(toast.foregroundColor)
                 .cornerRadius(8)
                 .padding(.bottom, 100)
                 .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -169,8 +174,8 @@ struct TodoListView: View {
                 .scrollDismissesKeyboard(.interactively)
                 TaskComposer()
             }
-            if let toastText = toastManager.toastText, let toastImageName = toastManager.toastImageName {
-                ToastView(text: toastText, imageName: toastImageName, foregroundColor: toastManager.toastForegroundColor)
+            if let toast = toastManager.currentToast {
+                ToastView(toast: toast)
             }
         }
         .environment(viewModel)
@@ -213,6 +218,14 @@ struct TaskComposer: View {
     let toastManager = ToastManager()
     let viewModel = TodoListViewModel(toastManager: toastManager)
     TodoListView(viewModel: viewModel, toastManager: toastManager)
+}
+
+#Preview {
+    ToastView(toast: Toast.errorSavingToast)
+}
+
+#Preview {
+    ToastView(toast: Toast.successSavingToast)
 }
 
 extension String {
