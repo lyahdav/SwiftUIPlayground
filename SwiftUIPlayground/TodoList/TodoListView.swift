@@ -150,7 +150,7 @@ struct ToastView: View {
             // TODO: Fix toast colors in dark mode
             Label(toast.text, systemImage: toast.imageName)
                 .padding()
-                .background(.primary)
+                .background(Color.black.opacity(0.8))
                 .foregroundColor(toast.foregroundColor)
                 .cornerRadius(8)
                 .padding(.bottom, 100)
