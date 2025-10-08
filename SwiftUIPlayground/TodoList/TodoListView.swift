@@ -96,6 +96,7 @@ struct TaskDetailView: View {
     }
     
     var body: some View {
+        // TODO: Improve layout, add labels
         VStack {
             TextField("Title", text: $title)
                 .padding()
@@ -114,15 +115,13 @@ struct TaskDetailView: View {
 struct Toast {
     let text: String
     let imageName: String
-    let foregroundColor: Color
     
-    init(text: String, imageName: String, foregroundColor: Color = .primary) {
+    init(text: String, imageName: String) {
         self.text = text
         self.imageName = imageName
-        self.foregroundColor = foregroundColor
     }
     
-    static let errorSavingToast = Toast(text: "Error saving tasks!", imageName: "exclamationmark.triangle.fill", foregroundColor: .yellow)
+    static let errorSavingToast = Toast(text: "Error saving tasks!", imageName: "exclamationmark.triangle.fill")
     static let successSavingToast = Toast(text: "Tasks saved", imageName: "checkmark.square.fill")
 }
 
@@ -154,8 +153,7 @@ struct ToastView: View {
             Spacer()
             Label(toast.text, systemImage: toast.imageName)
                 .padding()
-                .background(.regularMaterial)
-                .foregroundColor(toast.foregroundColor)
+                .background(.tertiary)
                 .cornerRadius(8)
                 .padding(.bottom, 100)
                 .transition(.move(edge: .bottom).combined(with: .opacity))
