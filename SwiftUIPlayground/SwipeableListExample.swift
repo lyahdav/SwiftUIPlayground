@@ -76,4 +76,3 @@ struct SwipeableListExample_Previews: PreviewProvider {
         SwipeableListExample()
     }
 }
-
