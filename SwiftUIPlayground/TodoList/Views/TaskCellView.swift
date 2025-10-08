@@ -7,7 +7,6 @@ struct TaskCellView: View {
     var body: some View {
         NavigationLink(value: task) {
             HStack {
-                Text("\(task.id)")
                 Text(task.title)
             }
             .swipeActions(edge: .trailing) {
@@ -19,3 +18,6 @@ struct TaskCellView: View {
     }
 }
 
+#Preview {
+    TaskCellView(task: Task.exampleTask, onDelete: {})
+}
