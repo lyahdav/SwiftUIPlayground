@@ -31,7 +31,7 @@ class TodoListViewModel {
     
     func addTask(newTaskTitle: String, numTasksToAdd: Int) {
         for _ in 0..<numTasksToAdd {
-            tasks[highestTaskId] = Task(id: highestTaskId, title: newTaskTitle, description: "", createdAt: Date())
+            tasks[highestTaskId] = Task(id: highestTaskId, title: newTaskTitle, description: "", createdAt: Date(), modifiedAt: Date())
             highestTaskId += 1
             saveTasksToStorage()
         }
@@ -46,6 +46,7 @@ class TodoListViewModel {
         if var task = tasks[taskId] {
             task.title = title
             task.description = description
+            task.modifiedAt = Date()
             tasks[taskId] = task
             saveTasksToStorage()
         }

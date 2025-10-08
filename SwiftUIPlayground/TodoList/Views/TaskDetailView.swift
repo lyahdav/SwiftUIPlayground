@@ -22,8 +22,8 @@ struct TaskDetailView: View {
             }
             Section(header: Text("Info")) {
                 Text("ID: \(task.id)")
-                Text("Created at: \(task.createdAt.formatted())")
-                // TODO: Add last modified at
+                Text("Created at: \(task.createdAt.formatted(date: .abbreviated, time: .standard))")
+                Text("Modified at: \(task.modifiedAt.formatted(date: .abbreviated, time: .standard))")
             }
         }
         Button("Delete") {

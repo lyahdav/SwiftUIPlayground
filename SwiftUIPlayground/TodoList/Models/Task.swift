@@ -5,6 +5,7 @@ struct Task: Identifiable, Codable, Hashable {
     var title: String
     var description: String
     let createdAt: Date
+    var modifiedAt: Date
     
-    static let exampleTask = Task(id: 1, title: "Task Title", description: "Task Description", createdAt: Date())
+    static let exampleTask = Task(id: 1, title: "Task Title", description: "Task Description", createdAt: Date(), modifiedAt: Date())
 }
