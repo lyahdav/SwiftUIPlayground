@@ -32,7 +32,7 @@ class TodoListViewModel {
             return
         }
         taskData = encodedTasks
-        showToast("Tasks saved")
+        showToast("Tasks saved", imageName: "checkmark.square.fill")
     }
     
     func addTask(newTaskTitle: String, numTasksToAdd: Int) {
@@ -62,7 +62,7 @@ class TodoListViewModel {
     }
     
     // TODO: Avoid having to repeat default color here
-    func showToast(_ text: String, imageName: String? = nil, foregroundColor: Color = Color(.systemBackground)) {
+    func showToast(_ text: String, imageName: String, foregroundColor: Color = Color(.systemBackground)) {
         withAnimation {
             toastText = text
             toastImageName = imageName
@@ -143,10 +143,10 @@ struct TodoListView: View {
                 TaskComposer()
             }
   
-            if let toastText = viewModel.toastText {
+            if let toastText = viewModel.toastText, let toastImageName = viewModel.toastImageName {
                 VStack {
                     Spacer()
-                    Label(toastText, systemImage: viewModel.toastImageName ?? "")
+                    Label(toastText, systemImage: toastImageName)
                         .padding()
                         .background(Color.black.opacity(0.8))
                         .foregroundColor(viewModel.toastForegroundColor)
