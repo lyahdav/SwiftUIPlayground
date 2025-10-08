@@ -8,6 +8,11 @@ class TodoListViewModel {
     @ObservationIgnored @AppStorage("taskData") private var taskData: Data = Data()
     
     var tasks: [Int: Task] = [:]
+    
+    // TODO: Wrap in struct
+    var toastText: String?
+    var toastImageName: String?
+    var toastForegroundColor: Color = Color(.systemBackground)
 
     init() {
         tasks = getTasksFromStorage()
@@ -21,14 +26,13 @@ class TodoListViewModel {
     }
     
     private func saveTasksToStorage() {
-        // TODO: Show toast?
-        print("Saving \(tasks.count) task(s) to storage...")
         guard let encodedTasks = try? JSONEncoder().encode(tasks) else {
-            // TODO: Show error in UI
-            print("Error saving tasks")
+            // TODO: Have a way to test what this looks like in preview
+            showToast("Error saving tasks!", imageName: "exclamationmark.triangle.fill", foregroundColor: .yellow)
             return
         }
         taskData = encodedTasks
+        showToast("Tasks saved")
     }
     
     func addTask(newTaskTitle: String, numTasksToAdd: Int) {
@@ -55,6 +59,21 @@ class TodoListViewModel {
     
     func getSortedTasks() -> [Task] {
         return tasks.values.sorted { $0.id < $1.id }
+    }
+    
+    // TODO: Avoid having to repeat default color here
+    func showToast(_ text: String, imageName: String? = nil, foregroundColor: Color = Color(.systemBackground)) {
+        withAnimation {
+            toastText = text
+            toastImageName = imageName
+            toastForegroundColor = foregroundColor
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            withAnimation { [weak self] in
+                self?.toastText = nil
+                self?.toastImageName = nil
+            }
+        }
     }
 }
 
@@ -113,14 +132,41 @@ struct TodoListView: View {
     @State private var viewModel = TodoListViewModel()
 
     var body: some View {
-        NavigationStack {
-            List(viewModel.getSortedTasks()) { task in
-                TaskCellView(task: task) {
-                    viewModel.deleteTask(task)
+        ZStack {
+            NavigationStack {
+                List(viewModel.getSortedTasks()) { task in
+                    TaskCellView(task: task) {
+                        viewModel.deleteTask(task)
+                    }
+                }
+                .scrollDismissesKeyboard(.interactively)
+                TaskComposer()
+            }
+  
+            // TODO
+//            VStack {
+//                Spacer()
+//                Label("A", systemImage: "exclamationmark.triangle.fill")
+//                    .padding()
+//                    .background(Color.black.opacity(0.8))
+//                    .foregroundColor(.yellow)
+//                    .cornerRadius(8)
+//                    .padding(.bottom, 100)
+//                    .transition(.move(edge: .bottom).combined(with: .opacity))
+//            }
+            
+            if let toastText = viewModel.toastText {
+                VStack {
+                    Spacer()
+                    Label(toastText, systemImage: viewModel.toastImageName ?? "")
+                        .padding()
+                        .background(Color.black.opacity(0.8))
+                        .foregroundColor(viewModel.toastForegroundColor)
+                        .cornerRadius(8)
+                        .padding(.bottom, 100)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
                 }
             }
-            .scrollDismissesKeyboard(.interactively)
-            TaskComposer()
         }
         .environment(viewModel)
     }
