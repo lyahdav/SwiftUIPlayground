@@ -130,6 +130,10 @@ struct Toast {
 class ToastManager {
     var currentToast: Toast?
     
+    init(currentToast: Toast? = nil) {
+        self.currentToast = currentToast
+    }
+    
     func showToast(_ toast: Toast) {
         withAnimation {
             currentToast = toast
@@ -221,11 +225,15 @@ struct TaskComposer: View {
 }
 
 #Preview {
-    ToastView(toast: Toast.errorSavingToast)
+    let toastManager = ToastManager(currentToast: Toast.errorSavingToast)
+    let viewModel = TodoListViewModel(toastManager: toastManager)
+    TodoListView(viewModel: viewModel, toastManager: toastManager)
 }
 
 #Preview {
-    ToastView(toast: Toast.successSavingToast)
+    let toastManager = ToastManager(currentToast: Toast.successSavingToast)
+    let viewModel = TodoListViewModel(toastManager: toastManager)
+    TodoListView(viewModel: viewModel, toastManager: toastManager)
 }
 
 extension String {
