@@ -47,9 +47,10 @@ class TodoListViewModel {
         saveTasksToStorage()
     }
     
-    func updateTaskDescription(taskId: Int, with description: String) {
+    func updateTask(taskId: Int, title: String, description: String) {
         // TODO: Avoid O(n)
         if let index = tasks.firstIndex(where: { $0.id == taskId }) {
+            tasks[index].title = title
             tasks[index].description = description
             saveTasksToStorage()
         }
@@ -84,15 +85,25 @@ struct TaskCellView: View {
 struct TaskDetailView: View {
     @Environment(TodoListViewModel.self) private var viewModel
     let task: Task
+    @State var title: String
     @State var description: String
+
+    init(task: Task) {
+        self.task = task
+        title = task.title
+        description = task.description
+    }
     
     var body: some View {
         VStack {
+            TextField("Title", text: $title)
+                .padding()
             TextField("Description", text: $description)
+                .padding()
         }
-        .navigationTitle(task.title)
+        .navigationTitle("Task")
         .onDisappear {
-            viewModel.updateTaskDescription(taskId: task.id, with: self.description)
+            viewModel.updateTask(taskId: task.id, title: title, description: description)
         }
     }
 }
@@ -111,10 +122,11 @@ struct TodoListView: View {
             // TODO: Extract view
             HStack {
                 TextField("New task", text: $viewModel.newTaskTitle)
-                // TODO: Disable button when TextField blank
+                let isTitleEmpty = viewModel.newTaskTitle.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
                 Button("Add") {
                     viewModel.addTask()
                 }
+                .disabled(isTitleEmpty)
                 Picker("Choose a number", selection: $viewModel.numTasksToAdd) {
                     ForEach(1...10, id: \.self) { number in
                         Text("\(number)").tag(number)
@@ -128,7 +140,7 @@ struct TodoListView: View {
             .padding()
             .navigationTitle("Todo List")
             .navigationDestination(for: Task.self) { task in
-                TaskDetailView(task: task, description: task.description)
+                TaskDetailView(task: task)
             }
         }
         .environment(viewModel)
@@ -144,3 +156,4 @@ extension String {
         return count == 1 ? self : self + "s"
     }
 }
+
