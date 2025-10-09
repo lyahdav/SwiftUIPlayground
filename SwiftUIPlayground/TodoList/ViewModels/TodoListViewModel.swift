@@ -5,7 +5,7 @@ class TodoListViewModel {
     @ObservationIgnored @AppStorage("highestTaskId") private var highestTaskId: Int = 0
     @ObservationIgnored @AppStorage("taskData") private var taskData: Data = Data()
 
-    var tasks: [Int: Task] = [:]
+    var tasks: [Int: TodoListTask] = [:]
     let toastManager: ToastManager
     
     init(toastManager: ToastManager) {
@@ -13,8 +13,8 @@ class TodoListViewModel {
         tasks = getTasksFromStorage()
     }
 
-    private func getTasksFromStorage() -> [Int: Task] {
-        if let tasks = try? JSONDecoder().decode([Int: Task].self, from: taskData) {
+    private func getTasksFromStorage() -> [Int: TodoListTask] {
+        if let tasks = try? JSONDecoder().decode([Int: TodoListTask].self, from: taskData) {
             return tasks
         }
         return [:] // If cannot decode, return none
@@ -32,13 +32,13 @@ class TodoListViewModel {
     func addTask(newTaskTitle: String, numTasksToAdd: Int) {
         for i in 0..<numTasksToAdd {
             let title = numTasksToAdd > 1 ? "\(newTaskTitle)\(i+1)" : newTaskTitle
-            tasks[highestTaskId] = Task(id: highestTaskId, title: title, description: "", createdAt: Date(), modifiedAt: Date())
+            tasks[highestTaskId] = TodoListTask(id: highestTaskId, title: title, description: "", createdAt: Date(), modifiedAt: Date())
             highestTaskId += 1
             saveTasksToStorage()
         }
     }
     
-    func deleteTask(_ task: Task) {
+    func deleteTask(_ task: TodoListTask) {
         tasks.removeValue(forKey: task.id)
         saveTasksToStorage()
     }
@@ -53,7 +53,7 @@ class TodoListViewModel {
         }
     }
     
-    func getSortedTasks() -> [Task] {
+    func getSortedTasks() -> [TodoListTask] {
         return tasks.values.sorted { $0.id < $1.id }
     }
 }

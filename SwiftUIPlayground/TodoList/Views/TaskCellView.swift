@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct TaskCellView: View {
-    let task: Task
+    let task: TodoListTask
     let onDelete: () -> Void
     
     var body: some View {
@@ -19,5 +19,5 @@ struct TaskCellView: View {
 }
 
 #Preview {
-    TaskCellView(task: Task.exampleTask, onDelete: {})
+    TaskCellView(task: TodoListTask.exampleTask, onDelete: {})
 }

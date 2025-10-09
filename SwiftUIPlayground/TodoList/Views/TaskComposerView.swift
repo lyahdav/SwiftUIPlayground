@@ -25,7 +25,7 @@ struct TaskComposerView: View {
         }
         .padding()
         .navigationTitle("Todo List")
-        .navigationDestination(for: Task.self) { task in
+        .navigationDestination(for: TodoListTask.self) { task in
             TaskDetailView(task: task)
         }
     }

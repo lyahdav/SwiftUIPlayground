@@ -4,11 +4,11 @@ struct TaskDetailView: View {
     @Environment(TodoListViewModel.self) private var viewModel
     @Environment(\.dismiss) private var dismiss
     
-    let task: Task
+    let task: TodoListTask
     @State var title: String
     @State var description: String
 
-    init(task: Task) {
+    init(task: TodoListTask) {
         self.task = task
         title = task.title
         description = task.description
@@ -40,6 +40,6 @@ struct TaskDetailView: View {
 }
 
 #Preview {
-    TaskDetailView(task: Task.exampleTask)
+    TaskDetailView(task: TodoListTask.exampleTask)
         .environment(TodoListViewModel(toastManager: ToastManager()))
 }
