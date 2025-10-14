@@ -120,7 +120,7 @@ struct TimerView: View {
     @StateObject private var viewModel = TimerViewModel()
     
     var body: some View {
-        TimerLabel(viewModel: viewModel) // ✅ Pass down
+        TimerLabel(viewModel: viewModel)
     }
 }
 
