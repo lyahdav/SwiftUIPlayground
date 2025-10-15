@@ -1,31 +1,37 @@
 import SwiftUI
 
 struct TodoListView: View {
-    let viewModel: TodoListViewModel
-    let toastManager: ToastManager
+  let viewModel: TodoListViewModel
+  let toastManager: ToastManager
 
-    var body: some View {
-        ZStack {
-            NavigationStack {
-                List(viewModel.getSortedTasks()) { task in
-                    TaskCellView(task: task) {
-                        viewModel.deleteTask(task)
-                    }
-                }
-                .scrollDismissesKeyboard(.interactively)
-                TaskComposerView()
-            }
-            if let toast = toastManager.currentToast {
-                ToastView(toast: toast)
-            }
+  var body: some View {
+    ZStack {
+      VStack {
+        List(viewModel.getSortedTasks()) { task in
+          TaskCellView(task: task) {
+            viewModel.deleteTask(task)
+          }
         }
-        .environment(viewModel)
-        .environment(toastManager)
+        .scrollDismissesKeyboard(.interactively)
+        TaskComposerView()
+          .navigationTitle("Todo List")
+          .navigationDestination(for: TodoListTask.self) { task in
+            TaskDetailView(task: task, viewModel: viewModel)
+          }
+      }
+      if let toast = toastManager.currentToast {
+        ToastView(toast: toast)
+      }
     }
+    .environment(toastManager)
+    .environment(viewModel)
+  }
 }
 
 #Preview {
-    let toastManager = ToastManager()
-    let viewModel = TodoListViewModel(toastManager: toastManager)
+  let toastManager = ToastManager()
+  let viewModel = TodoListViewModel(toastManager: toastManager)
+  NavigationStack {
     TodoListView(viewModel: viewModel, toastManager: toastManager)
+  }
 }

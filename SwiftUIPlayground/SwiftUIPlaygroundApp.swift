@@ -11,9 +11,7 @@ import SwiftUI
 struct SwiftUIPlaygroundApp: App {
     var body: some Scene {
         WindowGroup {
-            let toastManager = ToastManager()
-            let viewModel = TodoListViewModel(toastManager: toastManager)
-            TodoListView(viewModel: viewModel, toastManager: toastManager)
+          ExamplesList()
         }
     }
 }

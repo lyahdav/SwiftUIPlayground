@@ -1,45 +1,45 @@
 import SwiftUI
 
 struct TaskDetailView: View {
-    @Environment(TodoListViewModel.self) private var viewModel
-    @Environment(\.dismiss) private var dismiss
-    
-    let task: TodoListTask
-    @State var title: String
-    @State var description: String
+  let viewModel: TodoListViewModel
+  @Environment(\.dismiss) private var dismiss
 
-    init(task: TodoListTask) {
-        self.task = task
-        title = task.title
-        description = task.description
+  let task: TodoListTask
+  @State var title: String
+  @State var description: String
+
+  init(task: TodoListTask, viewModel: TodoListViewModel) {
+    self.task = task
+    self.viewModel = viewModel
+    title = task.title
+    description = task.description
+  }
+
+  var body: some View {
+    Form {
+      Section(header: Text("Details")) {
+        TextField("Title", text: $title)
+        TextField("Description", text: $description, axis: .vertical)
+      }
+      Section(header: Text("Info")) {
+        Text("ID: \(task.id)")
+        Text("Created at: \(task.createdAt.formatted(date: .abbreviated, time: .standard))")
+        Text("Modified at: \(task.modifiedAt.formatted(date: .abbreviated, time: .standard))")
+      }
     }
-    
-    var body: some View {
-        Form {
-            Section(header: Text("Details")) {
-                TextField("Title", text: $title)
-                TextField("Description", text: $description, axis: .vertical)
-            }
-            Section(header: Text("Info")) {
-                Text("ID: \(task.id)")
-                Text("Created at: \(task.createdAt.formatted(date: .abbreviated, time: .standard))")
-                Text("Modified at: \(task.modifiedAt.formatted(date: .abbreviated, time: .standard))")
-            }
-        }
-        Button("Delete") {
-            viewModel.deleteTask(task)
-            dismiss()
-        }
-        .navigationTitle("Task")
-        .onDisappear {
-            if title != task.title || description != task.description {
-                viewModel.updateTask(taskId: task.id, title: title, description: description)
-            }
-        }
+    Button("Delete") {
+      viewModel.deleteTask(task)
+      dismiss()
     }
+    .navigationTitle("Task")
+    .onDisappear {
+      if title != task.title || description != task.description {
+        viewModel.updateTask(taskId: task.id, title: title, description: description)
+      }
+    }
+  }
 }
 
 #Preview {
-    TaskDetailView(task: TodoListTask.exampleTask)
-        .environment(TodoListViewModel(toastManager: ToastManager()))
+  TaskDetailView(task: TodoListTask.exampleTask, viewModel: TodoListViewModel(toastManager: ToastManager()))
 }

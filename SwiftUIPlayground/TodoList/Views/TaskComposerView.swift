@@ -24,9 +24,5 @@ struct TaskComposerView: View {
                 .frame(maxWidth: 100)
         }
         .padding()
-        .navigationTitle("Todo List")
-        .navigationDestination(for: TodoListTask.self) { task in
-            TaskDetailView(task: task)
-        }
     }
 }
