@@ -9,7 +9,7 @@ struct ExamplesList: View {
   var body: some View {
     NavigationStack {
       List {
-        // TODO: Make this use enum directly
+        // TODO: Make this use enum directly, or have an array of SwiftUI View classes and use that to build list
         NavigationLink(value: Screen.todoList) {
           Text("TodoList")
         }

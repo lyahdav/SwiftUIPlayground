@@ -36,6 +36,7 @@ final class PaginatedItemsViewModel {
   }
 
   private func isNearBottom(currentItemID: String?) -> Bool {
+    // TODO: Avoid O(N) firstIndex
     guard let id = currentItemID, let idx = items.firstIndex(of: id) else { return true }
     // When the visible item is within the last 5 items, consider it near bottom
     return idx >= items.count - 5
