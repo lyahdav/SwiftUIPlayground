@@ -18,7 +18,7 @@ struct ExamplesList: View {
       List {
         ForEach(Array(examples.enumerated()), id: \.offset) { index, exampleType in
           NavigationLink(value: index) {
-            Text(String(describing: exampleType))
+            Text(formatPascalCase(exampleType))
           }
         }
       }
@@ -30,6 +30,12 @@ struct ExamplesList: View {
 
   private func createView(from type: any ExampleView.Type) -> AnyView {
     return AnyView(type.init())
+  }
+
+  private func formatPascalCase(_ type: any ExampleView.Type) -> String {
+    let string = String(describing: type)
+    return string.replacingOccurrences(
+      of: "([a-z])([A-Z])", with: "$1 $2", options: .regularExpression)
   }
 }
 
