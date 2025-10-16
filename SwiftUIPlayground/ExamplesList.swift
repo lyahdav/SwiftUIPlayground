@@ -2,6 +2,13 @@ import SwiftUI
 
 protocol ExampleView: View {
   init()
+  var title: String? { get }
+}
+
+extension ExampleView {
+  var title: String? {
+    return nil
+  }
 }
 
 struct ExamplesList: View {
@@ -20,7 +27,7 @@ struct ExamplesList: View {
       List {
         ForEach(Array(examples.enumerated()), id: \.offset) { index, exampleType in
           NavigationLink(value: index) {
-            Text(formatPascalCase(exampleType))
+            Text((createView(from: examples[index]) as? (any ExampleView))?.title ?? formatPascalCase(exampleType))
           }
         }
       }

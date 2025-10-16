@@ -6,7 +6,11 @@ struct GitHubAPIExample: ExampleView {
     @State private var user: GitHubUser?
     @State private var repo: GitHubRepo?
     @State private var isNight = false
-    
+
+    var title: String? {
+        "GitHub API Example"
+    }
+
     var body: some View {
         ZStack {
             ContainerRelativeShape()
