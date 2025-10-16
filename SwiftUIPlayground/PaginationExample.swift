@@ -119,6 +119,8 @@ struct PaginationExample: View {
         Spacer()
       }
       .listRowSeparator(.hidden)
+      // Required because otherwise it'll use index as id which changes as new items are inserted
+      .id("FooterView - \(viewModel.items.count)")
     } else if viewModel.reachedEnd && !viewModel.items.isEmpty {
       HStack {
         Spacer()

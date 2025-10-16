@@ -3,6 +3,7 @@ import SwiftUI
 enum Screen {
   case todoList
   case paginationExample
+  case backgroundThreadProcessingExample
 }
 
 struct ExamplesList: View {
@@ -16,6 +17,9 @@ struct ExamplesList: View {
         NavigationLink(value: Screen.paginationExample) {
           Text("PaginationExample")
         }
+        NavigationLink(value: Screen.backgroundThreadProcessingExample) {
+          Text("BackgroundThreadProcessingExample")
+        }
       }
       .navigationDestination(for: Screen.self) { screen in
         switch screen {
@@ -23,6 +27,8 @@ struct ExamplesList: View {
           WrappedTodoListView()
         case .paginationExample:
           PaginationExample()
+        case .backgroundThreadProcessingExample:
+          BackgroundThreadProcessingExample()
         }
       }
     }
