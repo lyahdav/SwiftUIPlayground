@@ -15,7 +15,7 @@ final class PaginatedItemsViewModel {
 
   init() {
     // Preload first page
-    Task { await loadNextPageIfNeeded(currentItemID: nil) }
+    Task { await loadNextPageIfNeeded(currentItemIndex: nil) }
   }
 
   func refresh() async {
@@ -27,17 +27,16 @@ final class PaginatedItemsViewModel {
     await loadNextPage()
   }
 
-  func loadNextPageIfNeeded(currentItemID: String?) async {
+  func loadNextPageIfNeeded(currentItemIndex: Int?) async {
     guard !isLoadingPage, !reachedEnd else { return }
     // Only trigger when the user reaches close to the bottom or on first load
-    if currentItemID == nil || isNearBottom(currentItemID: currentItemID) {
+    if currentItemIndex == nil || isNearBottom(currentItemIndex: currentItemIndex) {
       await loadNextPage()
     }
   }
 
-  private func isNearBottom(currentItemID: String?) -> Bool {
-    // TODO: Avoid O(N) firstIndex
-    guard let id = currentItemID, let idx = items.firstIndex(of: id) else { return true }
+  private func isNearBottom(currentItemIndex: Int?) -> Bool {
+    guard let idx = currentItemIndex else { return true }
     // When the visible item is within the last 5 items, consider it near bottom
     return idx >= items.count - 5
   }
@@ -80,10 +79,10 @@ struct PaginationExample: ExampleView {
 
   var body: some View {
     List {
-      ForEach(viewModel.items, id: \.self) { item in
+      ForEach(Array(viewModel.items.enumerated()), id: \.element) { index, item in
         Text(item)
           .onAppear {
-            Task { await viewModel.loadNextPageIfNeeded(currentItemID: item) }
+            Task { await viewModel.loadNextPageIfNeeded(currentItemIndex: index) }
           }
       }
 
