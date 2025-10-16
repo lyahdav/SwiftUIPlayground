@@ -1,8 +1,8 @@
 import SwiftUI
 internal import Combine
 
-struct ContentView: View {
-    
+struct GitHubAPIExample: ExampleView {
+
     @State private var user: GitHubUser?
     @State private var repo: GitHubRepo?
     @State private var isNight = false
@@ -150,5 +150,5 @@ enum GHError: Error {
 }
 
 #Preview {
-    ContentView()
+  GitHubAPIExample()
 }

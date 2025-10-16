@@ -54,7 +54,6 @@ struct WishListDetailView: View {
           Text("Loading wishlist items...")
             .foregroundColor(.secondary)
         }
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
       } else {
         List(items) { item in
           HStack {
@@ -76,6 +75,13 @@ struct WishListDetailView: View {
       }
     }
     .navigationTitle(wishList.title)
+    .toolbar {
+      ToolbarItem(placement: .navigationBarTrailing) {
+        NavigationLink(destination: WishListEditView(wishList: wishList)) {
+          Text("Edit")
+        }
+      }
+    }
     .task {
       await loadWishListItems()
     }
@@ -99,6 +105,23 @@ struct WishListDetailView: View {
       self.items = sampleItems
       self.isLoading = false
     }
+  }
+}
+
+struct WishListEditView: View {
+  let wishList: WishList
+
+  var body: some View {
+    VStack {
+      Text("Edit Wish List")
+        .font(.title)
+        .padding(.bottom, 8)
+      Text(wishList.title)
+        .font(.title2)
+        .foregroundStyle(.secondary)
+    }
+    .navigationTitle("Edit")
+    .background(Color(.systemGroupedBackground).ignoresSafeArea())
   }
 }
 

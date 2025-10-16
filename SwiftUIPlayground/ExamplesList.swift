@@ -12,6 +12,7 @@ struct ExamplesList: View {
     ListReorderExampleWithStableIds.self,
     ListReorderExampleWithoutStableIds.self,
     DeepNavigationExample.self,
+    GitHubAPIExample.self,
   ]
 
   var body: some View {
