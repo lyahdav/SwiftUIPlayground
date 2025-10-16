@@ -11,6 +11,7 @@ struct ExamplesList: View {
     BackgroundThreadProcessingExample.self,
     ListReorderExampleWithStableIds.self,
     ListReorderExampleWithoutStableIds.self,
+    DeepNavigationExample.self,
   ]
 
   var body: some View {
