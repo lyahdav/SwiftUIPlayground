@@ -6,7 +6,7 @@ protocol ExampleView: View {
 
 struct ExamplesList: View {
   private let examples: [any ExampleView.Type] = [
-    WrappedTodoListView.self,
+    TodoListView.self,
     PaginationExample.self,
     BackgroundThreadProcessingExample.self,
     ListReorderExampleWithStableIds.self,
@@ -23,18 +23,13 @@ struct ExamplesList: View {
         }
       }
       .navigationDestination(for: Int.self) { index in
-        AnyView(examples[index].init())
+        createView(from: examples[index])
       }
     }
   }
-}
 
-struct WrappedTodoListView: ExampleView {
-  let toastManager = ToastManager()
-
-  var body: some View {
-    TodoListView(
-      viewModel: TodoListViewModel(toastManager: toastManager), toastManager: toastManager)
+  private func createView(from type: any ExampleView.Type) -> AnyView {
+    return AnyView(type.init())
   }
 }
 

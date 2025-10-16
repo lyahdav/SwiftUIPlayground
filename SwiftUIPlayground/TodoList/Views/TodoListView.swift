@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct TodoListView: View {
+struct TodoListViewInternal: View {
   let viewModel: TodoListViewModel
   let toastManager: ToastManager
 
@@ -28,10 +28,17 @@ struct TodoListView: View {
   }
 }
 
-#Preview {
+struct TodoListView: ExampleView {
   let toastManager = ToastManager()
-  let viewModel = TodoListViewModel(toastManager: toastManager)
+
+  var body: some View {
+    TodoListViewInternal(
+      viewModel: TodoListViewModel(toastManager: toastManager), toastManager: toastManager)
+  }
+}
+
+#Preview {
   NavigationStack {
-    TodoListView(viewModel: viewModel, toastManager: toastManager)
+    TodoListView()
   }
 }

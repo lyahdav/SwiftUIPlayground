@@ -39,11 +39,11 @@ struct ToastView: View {
 #Preview {
     let toastManager = ToastManager(currentToast: Toast.errorSavingToast)
     let viewModel = TodoListViewModel(toastManager: toastManager)
-    TodoListView(viewModel: viewModel, toastManager: toastManager)
+    TodoListViewInternal(viewModel: viewModel, toastManager: toastManager)
 }
 
 #Preview {
     let toastManager = ToastManager(currentToast: Toast.successSavingToast)
     let viewModel = TodoListViewModel(toastManager: toastManager)
-    TodoListView(viewModel: viewModel, toastManager: toastManager)
+  TodoListViewInternal(viewModel: viewModel, toastManager: toastManager)
 }
