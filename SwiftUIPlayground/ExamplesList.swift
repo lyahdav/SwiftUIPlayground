@@ -4,6 +4,8 @@ enum Screen {
   case todoList
   case paginationExample
   case backgroundThreadProcessingExample
+  case listReorderExample
+  case listReorderExampleWithoutStableIds
 }
 
 struct ExamplesList: View {
@@ -20,6 +22,12 @@ struct ExamplesList: View {
         NavigationLink(value: Screen.backgroundThreadProcessingExample) {
           Text("BackgroundThreadProcessingExample")
         }
+        NavigationLink(value: Screen.listReorderExample) {
+          Text("ListReorderExample")
+        }
+        NavigationLink(value: Screen.listReorderExampleWithoutStableIds) {
+          Text("ListReorderExampleWithoutStableIds")
+        }
       }
       .navigationDestination(for: Screen.self) { screen in
         switch screen {
@@ -29,6 +37,10 @@ struct ExamplesList: View {
           PaginationExample()
         case .backgroundThreadProcessingExample:
           BackgroundThreadProcessingExample()
+        case .listReorderExample:
+          ListReorderExample(withStableIds: true)
+        case .listReorderExampleWithoutStableIds:
+          ListReorderExample(withStableIds: false)
         }
       }
     }
