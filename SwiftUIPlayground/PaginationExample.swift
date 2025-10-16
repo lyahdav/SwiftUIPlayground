@@ -75,7 +75,7 @@ final class PaginatedItemsViewModel {
 }
 
 // MARK: - View
-struct PaginationExample: View {
+struct PaginationExample: ExampleView {
   private var viewModel = PaginatedItemsViewModel()
 
   var body: some View {

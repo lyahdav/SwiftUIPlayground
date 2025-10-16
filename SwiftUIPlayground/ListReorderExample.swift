@@ -44,6 +44,18 @@ struct ListReorderExample: View {
   }
 }
 
+struct ListReorderExampleWithStableIds: ExampleView {
+  var body: some View {
+    ListReorderExample(withStableIds: true)
+  }
+}
+
+struct ListReorderExampleWithoutStableIds: ExampleView {
+  var body: some View {
+    ListReorderExample(withStableIds: false)
+  }
+}
+
 #Preview {
-  ListReorderExample(withStableIds: true)
+  ListReorderExampleWithStableIds()
 }

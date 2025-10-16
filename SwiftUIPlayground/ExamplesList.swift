@@ -1,57 +1,40 @@
 import SwiftUI
 
-enum Screen {
-  case todoList
-  case paginationExample
-  case backgroundThreadProcessingExample
-  case listReorderExample
-  case listReorderExampleWithoutStableIds
+protocol ExampleView: View {
+  init()
 }
 
 struct ExamplesList: View {
+  private let examples: [any ExampleView.Type] = [
+    WrappedTodoListView.self,
+    PaginationExample.self,
+    BackgroundThreadProcessingExample.self,
+    ListReorderExampleWithStableIds.self,
+    ListReorderExampleWithoutStableIds.self,
+  ]
+
   var body: some View {
     NavigationStack {
       List {
-        // TODO: Make this use enum directly, or have an array of SwiftUI View classes and use that to build list
-        NavigationLink(value: Screen.todoList) {
-          Text("TodoList")
-        }
-        NavigationLink(value: Screen.paginationExample) {
-          Text("PaginationExample")
-        }
-        NavigationLink(value: Screen.backgroundThreadProcessingExample) {
-          Text("BackgroundThreadProcessingExample")
-        }
-        NavigationLink(value: Screen.listReorderExample) {
-          Text("ListReorderExample")
-        }
-        NavigationLink(value: Screen.listReorderExampleWithoutStableIds) {
-          Text("ListReorderExampleWithoutStableIds")
+        ForEach(Array(examples.enumerated()), id: \.offset) { index, exampleType in
+          NavigationLink(value: index) {
+            Text(String(describing: exampleType))
+          }
         }
       }
-      .navigationDestination(for: Screen.self) { screen in
-        switch screen {
-        case .todoList:
-          WrappedTodoListView()
-        case .paginationExample:
-          PaginationExample()
-        case .backgroundThreadProcessingExample:
-          BackgroundThreadProcessingExample()
-        case .listReorderExample:
-          ListReorderExample(withStableIds: true)
-        case .listReorderExampleWithoutStableIds:
-          ListReorderExample(withStableIds: false)
-        }
+      .navigationDestination(for: Int.self) { index in
+        AnyView(examples[index].init())
       }
     }
   }
 }
 
-struct WrappedTodoListView: View {
+struct WrappedTodoListView: ExampleView {
   let toastManager = ToastManager()
 
   var body: some View {
-    TodoListView(viewModel: TodoListViewModel(toastManager: toastManager), toastManager: toastManager)
+    TodoListView(
+      viewModel: TodoListViewModel(toastManager: toastManager), toastManager: toastManager)
   }
 }
 
