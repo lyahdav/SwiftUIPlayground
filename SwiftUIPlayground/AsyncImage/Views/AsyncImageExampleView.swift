@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct AsyncImageExampleView: View {
-  let viewModel = AsyncImageExampleViewModel()
+  @State var viewModel = AsyncImageExampleViewModel()
 
   var body: some View {
     ZStack {
