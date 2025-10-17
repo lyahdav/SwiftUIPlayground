@@ -105,7 +105,28 @@ struct WishListEditView: View {
       Text("Edit Wish List")
         .font(.title)
         .padding(.bottom, 8)
-      TextField("Title", text: $wishList.title)
+      VStack(alignment: .leading, spacing: 4) {
+        TextField("Title", text: $wishList.title)
+          .onChange(of: wishList.title) { _, newValue in
+            if newValue.count > 20 {
+              wishList.title = String(newValue.prefix(20))
+            }
+          }
+
+        HStack {
+          Text("\(wishList.title.count)/20")
+            .font(.caption)
+            .foregroundColor(wishList.title.count >= 20 ? .red : .secondary)
+
+          Spacer()
+
+          if wishList.title.count >= 20 {
+            Text("Maximum length reached")
+              .font(.caption)
+              .foregroundColor(.red)
+          }
+        }
+      }
       Spacer()
     }
     .navigationTitle("Edit")
