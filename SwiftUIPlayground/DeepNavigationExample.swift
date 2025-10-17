@@ -7,18 +7,10 @@ struct WishListItem: Identifiable {
   let isPurchased: Bool
 }
 
-struct WishList: Identifiable, Hashable {
+struct WishList: Identifiable {
   let id = UUID()
   var title: String
   let items: [WishListItem]
-
-  static func == (lhs: WishList, rhs: WishList) -> Bool {
-    lhs.id == rhs.id
-  }
-
-  func hash(into hasher: inout Hasher) {
-    hasher.combine(id)
-  }
 }
 
 struct DeepNavigationExample: ExampleView {
@@ -28,9 +20,9 @@ struct DeepNavigationExample: ExampleView {
 
   var body: some View {
     List {
-      ForEach(wishLists.indices, id:\.self) { index in
-        NavigationLink(wishLists[index].title) {
-          WishListDetailView(wishList: $wishLists[index])
+      ForEach($wishLists) { $wishList in
+        NavigationLink(wishList.title) {
+          WishListDetailView(wishList: $wishList)
         }
       }
     }
