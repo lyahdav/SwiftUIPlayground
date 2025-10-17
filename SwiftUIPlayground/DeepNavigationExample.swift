@@ -1,28 +1,30 @@
 import SwiftUI
 
-struct WishListItem: Identifiable {
+struct ProjectTask: Identifiable {
   let id = UUID()
   let name: String
-  let price: String
-  let isPurchased: Bool
+  let priority: String
+  let isCompleted: Bool
 }
 
-struct WishList: Identifiable {
+struct Project: Identifiable {
   let id = UUID()
   var title: String
-  let items: [WishListItem]
+  let tasks: [ProjectTask]
 }
 
 struct DeepNavigationExample: ExampleView {
-  @State private var wishLists = ["Wish List 1", "Wish List 2", "Wish List 3"].map {
-    WishList(title: $0, items: [])
+  @State private var projects = [
+    "Mobile App Development", "Website Redesign", "Marketing Campaign",
+  ].map {
+    Project(title: $0, tasks: [])
   }
 
   var body: some View {
     List {
-      ForEach($wishLists) { $wishList in
-        NavigationLink(wishList.title) {
-          WishListDetailView(wishList: $wishList)
+      ForEach($projects) { $project in
+        NavigationLink(project.title) {
+          ProjectDetailView(project: $project)
         }
       }
     }
@@ -30,9 +32,9 @@ struct DeepNavigationExample: ExampleView {
   }
 }
 
-struct WishListDetailView: View {
-  @Binding var wishList: WishList
-  @State private var items: [WishListItem] = []
+struct ProjectDetailView: View {
+  @Binding var project: Project
+  @State private var tasks: [ProjectTask] = []
   @State private var isLoading = true
 
   var body: some View {
@@ -40,21 +42,21 @@ struct WishListDetailView: View {
       if isLoading {
         VStack {
           ProgressView()
-          Text("Loading wishlist items...")
+          Text("Loading project tasks...")
             .foregroundColor(.secondary)
         }
       } else {
-        List(items) { item in
+        List(tasks) { task in
           HStack {
             VStack(alignment: .leading, spacing: 4) {
-              Text(item.name)
+              Text(task.name)
                 .font(.headline)
-              Text(item.price)
+              Text(task.priority)
                 .font(.subheadline)
                 .foregroundColor(.secondary)
             }
             Spacer()
-            if item.isPurchased {
+            if task.isCompleted {
               Image(systemName: "checkmark.circle.fill")
                 .foregroundColor(.green)
             }
@@ -63,64 +65,64 @@ struct WishListDetailView: View {
         }
       }
     }
-    .navigationTitle(wishList.title)
+    .navigationTitle(project.title)
     .toolbar {
       ToolbarItem(placement: .navigationBarTrailing) {
-        NavigationLink(destination: WishListEditView(wishList: $wishList)) {
+        NavigationLink(destination: ProjectEditView(project: $project)) {
           Text("Edit")
         }
       }
     }
     .task {
-      await loadWishListItems()
+      await loadProjectTasks()
     }
   }
 
-  private func loadWishListItems() async {
+  private func loadProjectTasks() async {
     // Simulate network delay
     try? await Task.sleep(nanoseconds: 500_000_000)  // 0.5 seconds
 
     // Hard-coded sample data
-    let sampleItems: [WishListItem] = [
-      WishListItem(name: "Wireless Headphones", price: "$199.99", isPurchased: false),
-      WishListItem(name: "Coffee Maker", price: "$89.99", isPurchased: true),
-      WishListItem(name: "Bluetooth Speaker", price: "$79.99", isPurchased: false),
-      WishListItem(name: "Smart Watch", price: "$299.99", isPurchased: false),
-      WishListItem(name: "Laptop Stand", price: "$49.99", isPurchased: true),
-      WishListItem(name: "Desk Lamp", price: "$39.99", isPurchased: false),
+    let sampleTasks: [ProjectTask] = [
+      ProjectTask(name: "Design User Interface", priority: "High", isCompleted: false),
+      ProjectTask(name: "Implement Authentication", priority: "High", isCompleted: true),
+      ProjectTask(name: "Write Unit Tests", priority: "Medium", isCompleted: false),
+      ProjectTask(name: "Setup CI/CD Pipeline", priority: "Medium", isCompleted: false),
+      ProjectTask(name: "Code Review", priority: "Low", isCompleted: true),
+      ProjectTask(name: "Documentation", priority: "Low", isCompleted: false),
     ]
 
     await MainActor.run {
-      self.items = sampleItems
+      self.tasks = sampleTasks
       self.isLoading = false
     }
   }
 }
 
-struct WishListEditView: View {
-  @Binding var wishList: WishList
+struct ProjectEditView: View {
+  @Binding var project: Project
 
   var body: some View {
     VStack {
-      Text("Edit Wish List")
+      Text("Edit Project")
         .font(.title)
         .padding(.bottom, 8)
       VStack(alignment: .leading, spacing: 4) {
-        TextField("Title", text: $wishList.title)
-          .onChange(of: wishList.title) { _, newValue in
-            if newValue.count > 20 {
-              wishList.title = String(newValue.prefix(20))
+        TextField("Title", text: $project.title)
+          .onChange(of: project.title) { _, newValue in
+            if newValue.count > 30 {
+              project.title = String(newValue.prefix(30))
             }
           }
 
         HStack {
-          Text("\(wishList.title.count)/20")
+          Text("\(project.title.count)/30")
             .font(.caption)
-            .foregroundColor(wishList.title.count >= 20 ? .red : .secondary)
+            .foregroundColor(project.title.count >= 30 ? .red : .secondary)
 
           Spacer()
 
-          if wishList.title.count >= 20 {
+          if project.title.count >= 30 {
             Text("Maximum length reached")
               .font(.caption)
               .foregroundColor(.red)
