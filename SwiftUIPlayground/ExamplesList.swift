@@ -27,7 +27,7 @@ struct ExamplesList: View {
       List {
         ForEach(Array(examples.enumerated()), id: \.offset) { index, exampleType in
           NavigationLink(value: index) {
-            Text((createView(from: examples[index]) as? (any ExampleView))?.title ?? formatPascalCase(exampleType))
+            Text(displayTitle(for: exampleType))
           }
         }
       }
@@ -39,6 +39,11 @@ struct ExamplesList: View {
 
   private func createView(from type: any ExampleView.Type) -> AnyView {
     return AnyView(type.init())
+  }
+
+  private func displayTitle(for type: any ExampleView.Type) -> String {
+    let exampleView = type.init()
+    return exampleView.title ?? formatPascalCase(type)
   }
 
   private func formatPascalCase(_ type: any ExampleView.Type) -> String {
