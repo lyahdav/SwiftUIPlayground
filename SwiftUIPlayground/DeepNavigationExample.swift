@@ -13,7 +13,7 @@ struct Project: Identifiable {
   let tasks: [ProjectTask]
 }
 
-struct DeepNavigationExample: ExampleView {
+struct DeepNavigationExample: View {
   @State private var projects = [
     "Mobile App Development", "Website Redesign", "Marketing Campaign",
   ].map {

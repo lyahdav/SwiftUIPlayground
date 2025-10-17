@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct AsyncImageExampleView: ExampleView {
+struct AsyncImageExampleView: View {
   let viewModel = AsyncImageExampleViewModel()
 
   var body: some View {

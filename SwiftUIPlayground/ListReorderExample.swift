@@ -44,13 +44,13 @@ struct ListReorderExample: View {
   }
 }
 
-struct ListReorderExampleWithStableIds: ExampleView {
+struct ListReorderExampleWithStableIds: View {
   var body: some View {
     ListReorderExample(withStableIds: true)
   }
 }
 
-struct ListReorderExampleWithoutStableIds: ExampleView {
+struct ListReorderExampleWithoutStableIds: View {
   var body: some View {
     ListReorderExample(withStableIds: false)
   }

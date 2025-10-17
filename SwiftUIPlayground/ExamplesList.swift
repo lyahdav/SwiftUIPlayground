@@ -1,26 +1,33 @@
 import SwiftUI
 
-protocol ExampleView: View {
-  init()
-  var title: String? { get }
-}
-
-extension ExampleView {
-  var title: String? {
-    return nil
-  }
+protocol CustomTitleConforming {
+  var title: String { get }
 }
 
 struct ExamplesList: View {
-  private let examples: [any ExampleView.Type] = [
-    TodoListView.self,
-    PaginationExample.self,
-    BackgroundThreadProcessingExample.self,
-    ListReorderExampleWithStableIds.self,
-    ListReorderExampleWithoutStableIds.self,
-    DeepNavigationExample.self,
-    GitHubAPIExample.self,
-    AsyncImageExampleView.self,
+  // Equivalent to:
+  // private static func getTitle<V: View>(for view: V) -> String {
+  private static func getTitle(for view: some View) -> String {
+    if let customTitleConforming = view as? CustomTitleConforming {
+      customTitleConforming.title
+    } else {
+      formatPascalCase(String(describing: type(of: view).self))
+    }
+  }
+
+  private static func makeAnyView(view: some View) -> (AnyView, String) {
+    return (AnyView(view), getTitle(for: view))
+  }
+
+  private let examples: [(view: AnyView, title: String)] = [
+    makeAnyView(view: TodoListView()),
+    makeAnyView(view: PaginationExample()),
+    makeAnyView(view: BackgroundThreadProcessingExample()),
+    makeAnyView(view: ListReorderExampleWithStableIds()),
+    makeAnyView(view: ListReorderExampleWithoutStableIds()),
+    makeAnyView(view: DeepNavigationExample()),
+    makeAnyView(view: GitHubAPIExample()),
+    makeAnyView(view: AsyncImageExampleView()),
   ]
 
   var body: some View {
@@ -28,29 +35,22 @@ struct ExamplesList: View {
       List {
         ForEach(Array(examples.enumerated()), id: \.offset) { index, exampleType in
           NavigationLink(value: index) {
-            Text(displayTitle(for: exampleType))
+            Text(examples[index].title)
           }
         }
       }
       .navigationDestination(for: Int.self) { index in
-        createView(from: examples[index])
+        examples[index].view
       }
     }
   }
 
-  private func createView(from type: any ExampleView.Type) -> AnyView {
-    return AnyView(type.init())
-  }
-
-  private func displayTitle(for type: any ExampleView.Type) -> String {
-    let exampleView = type.init()
-    return exampleView.title ?? formatPascalCase(type)
-  }
-
-  private func formatPascalCase(_ type: any ExampleView.Type) -> String {
-    let string = String(describing: type)
-    return string.replacingOccurrences(
-      of: "([a-z])([A-Z])", with: "$1 $2", options: .regularExpression)
+  static private func formatPascalCase(_ type: String) -> String {
+    return type.replacingOccurrences(
+      of: "([a-z])([A-Z])",
+      with: "$1 $2",
+      options: .regularExpression
+    )
   }
 }
 

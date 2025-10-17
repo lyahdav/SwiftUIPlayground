@@ -28,7 +28,7 @@ struct TodoListViewInternal: View {
   }
 }
 
-struct TodoListView: ExampleView {
+struct TodoListView: View {
   let toastManager = ToastManager()
 
   var body: some View {

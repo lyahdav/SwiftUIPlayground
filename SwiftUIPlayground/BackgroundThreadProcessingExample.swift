@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct BackgroundThreadProcessingExample: ExampleView {
+struct BackgroundThreadProcessingExample: View {
   @State private var result: String = "Waiting…"
   @State private var isLoading = false
 
