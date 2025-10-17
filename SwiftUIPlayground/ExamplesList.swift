@@ -20,6 +20,7 @@ struct ExamplesList: View {
     ListReorderExampleWithoutStableIds.self,
     DeepNavigationExample.self,
     GitHubAPIExample.self,
+    AsyncImageExampleView.self,
   ]
 
   var body: some View {
