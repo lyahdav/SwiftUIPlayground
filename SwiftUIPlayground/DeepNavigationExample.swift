@@ -9,7 +9,7 @@ struct WishListItem: Identifiable {
 
 struct WishList: Identifiable, Hashable {
   let id = UUID()
-  let title: String
+  var title: String
   let items: [WishListItem]
 
   static func == (lhs: WishList, rhs: WishList) -> Bool {
@@ -28,21 +28,18 @@ struct DeepNavigationExample: ExampleView {
 
   var body: some View {
     List {
-      ForEach(wishLists) { wishList in
-        NavigationLink(value: wishList) {
-          Text(wishList.title)
+      ForEach(wishLists.indices, id:\.self) { index in
+        NavigationLink(wishLists[index].title) {
+          WishListDetailView(wishList: $wishLists[index])
         }
       }
     }
     .navigationTitle("Deep Navigation")
-    .navigationDestination(for: WishList.self) { wishList in
-      WishListDetailView(wishList: wishList)
-    }
   }
 }
 
 struct WishListDetailView: View {
-  let wishList: WishList
+  @Binding var wishList: WishList
   @State private var items: [WishListItem] = []
   @State private var isLoading = true
 
@@ -77,7 +74,7 @@ struct WishListDetailView: View {
     .navigationTitle(wishList.title)
     .toolbar {
       ToolbarItem(placement: .navigationBarTrailing) {
-        NavigationLink(destination: WishListEditView(wishList: wishList)) {
+        NavigationLink(destination: WishListEditView(wishList: $wishList)) {
           Text("Edit")
         }
       }
@@ -109,19 +106,17 @@ struct WishListDetailView: View {
 }
 
 struct WishListEditView: View {
-  let wishList: WishList
+  @Binding var wishList: WishList
 
   var body: some View {
     VStack {
       Text("Edit Wish List")
         .font(.title)
         .padding(.bottom, 8)
-      Text(wishList.title)
-        .font(.title2)
-        .foregroundStyle(.secondary)
+      TextField("Title", text: $wishList.title)
+      Spacer()
     }
     .navigationTitle("Edit")
-    .background(Color(.systemGroupedBackground).ignoresSafeArea())
   }
 }
 
