@@ -29,8 +29,16 @@ class ArticlesViewModel {
   let articlesService = ArticlesService()
   var state: ArticlesListState = .loading
   var articles: [Article] = []
-  var filteredArticles: [Article] = []
   var selectedFilter: Filter = .all
+
+  var filteredArticles: [Article] {
+    switch selectedFilter {
+    case .all:
+      return articles
+    case .favorites:
+      return articles.filter { $0.isFavorite }
+    }
+  }
 
   @ObservationIgnored @AppStorage("articleFavoriteData") private var articleFavoriteData = Data()
 
@@ -64,7 +72,6 @@ class ArticlesViewModel {
         // can't use article on left side here as it would be a copy
         articles[i].isFavorite = articleFavoriteMap[article.id] ?? false
       }
-      onUpdateFilter()
       state = .loaded
     } catch {
       state = .error(error)
@@ -76,16 +83,6 @@ class ArticlesViewModel {
     if let articleIndex = articles.firstIndex(where: { $0.id == id }) {
       articles[articleIndex].isFavorite.toggle()
       saveArticleFavoriteDataToStorage()
-      onUpdateFilter()
-    }
-  }
-
-  func onUpdateFilter() {
-    switch selectedFilter {
-    case .all:
-      filteredArticles = articles
-    case .favorites:
-      filteredArticles = articles.filter { $0.isFavorite }
     }
   }
 }
@@ -106,7 +103,6 @@ struct ArticlesList: View {
         }
       }
       .pickerStyle(.segmented)
-      .onChange(of: viewModel.selectedFilter, viewModel.onUpdateFilter)
       switch viewModel.state {
       case .loading:
         VStack {
@@ -117,8 +113,8 @@ struct ArticlesList: View {
       case .error(let error):
         Text("Error: \(error.localizedDescription)")
       case .loaded:
-        List($viewModel.filteredArticles) { $article in
-          ArticleRow(article: $article, viewModel: viewModel)
+        List(viewModel.filteredArticles) { article in
+          ArticleRow(article: article, viewModel: viewModel)
         }
       }
     }
@@ -129,7 +125,7 @@ struct ArticlesList: View {
 }
 
 struct ArticleRow: View {
-  @Binding var article: Article
+  let article: Article
   let viewModel: ArticlesViewModel
 
   var body: some View {
