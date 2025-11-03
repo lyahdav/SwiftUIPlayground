@@ -30,7 +30,7 @@ class ArticlesViewModel {
   var state: ArticlesListState = .loading
   var articles: [Article] = []
   var filteredArticles: [Article] = []
-  var selectedFilter: String = "All"
+  var selectedFilter: Filter = .all
 
   @ObservationIgnored @AppStorage("articleFavoriteData") private var articleFavoriteData = Data()
 
@@ -81,25 +81,28 @@ class ArticlesViewModel {
   }
 
   func onUpdateFilter() {
-    if selectedFilter == "All" {
+    switch selectedFilter {
+    case .all:
       filteredArticles = articles
-    } else {
+    case .favorites:
       filteredArticles = articles.filter { $0.isFavorite }
     }
   }
 }
 
+enum Filter: String, CaseIterable {
+  case all = "All"
+  case favorites = "Favorites"
+}
+
 struct ArticlesList: View {
   @State private var viewModel = ArticlesViewModel()
-
-  // TODO: Move to viewmodel with enum type
-  let filters = ["All", "Favorites"]
 
   var body: some View {
     VStack {
       Picker("Select filter", selection: $viewModel.selectedFilter) {
-        ForEach(filters, id: \.self) {
-          Text($0)
+        ForEach(Filter.allCases, id: \.self) { filter in
+          Text(filter.rawValue)
         }
       }
       .pickerStyle(.segmented)
