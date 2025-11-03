@@ -4,7 +4,6 @@ struct Article: Identifiable {
   let id: String
   let title: String
   let summary: String
-  var isFavorite: Bool = false
 }
 
 class ArticlesService {
@@ -21,69 +20,58 @@ class ArticlesService {
 enum ArticlesListState {
   case loading
   case error(Error)
-  case loaded
+  case loaded([Article])
 }
 
 @Observable
 class ArticlesViewModel {
   let articlesService = ArticlesService()
   var state: ArticlesListState = .loading
-  var articles: [Article] = []
   var selectedFilter: Filter = .all
+  var articleFavorites: [String: Bool] = [:]
 
   var filteredArticles: [Article] {
+    guard case let .loaded(articles) = state else { return [] }
     switch selectedFilter {
     case .all:
       return articles
     case .favorites:
-      return articles.filter { $0.isFavorite }
+      return articles.filter { articleFavorites[$0.id] == true }
     }
   }
 
   @ObservationIgnored @AppStorage("articleFavoriteData") private var articleFavoriteData = Data()
 
-  // Computed property to work with dictionary
-  private var articleFavoriteMap: [String: Bool] {
-    get {
-      if let decoded = try? JSONDecoder().decode([String: Bool].self, from: articleFavoriteData) {
-        return decoded
-      }
-      return [:]  // default empty dictionary
+  func getArticleFavorites() -> [String: Bool] {
+    if let decoded = try? JSONDecoder().decode([String: Bool].self, from: articleFavoriteData) {
+      return decoded
     }
-    set {
-      if let encoded = try? JSONEncoder().encode(newValue) {
-        articleFavoriteData = encoded
-      }
-    }
+    return [:]  // default empty dictionary
   }
 
   private func saveArticleFavoriteDataToStorage() {
-    var newArticleFavoriteMap: [String: Bool] = [:]
-    for article in articles {
-      newArticleFavoriteMap[article.id] = article.isFavorite
+    if let encoded = try? JSONEncoder().encode(articleFavorites) {
+      articleFavoriteData = encoded
     }
-    articleFavoriteMap = newArticleFavoriteMap
+  }
+
+  func isFavorite(article: Article) -> Bool {
+    return articleFavorites[article.id, default: false]
   }
 
   func fetchArticles() async {
     do {
-      articles = try await articlesService.fetchArticles()
-      for (i, article) in articles.enumerated() {
-        // can't use article on left side here as it would be a copy
-        articles[i].isFavorite = articleFavoriteMap[article.id] ?? false
-      }
-      state = .loaded
+      let articles = try await articlesService.fetchArticles()
+      articleFavorites = getArticleFavorites()
+      state = .loaded(articles)
     } catch {
       state = .error(error)
     }
   }
 
   func toggleFavorite(forArticleWithId id: String) {
-    // TODO: avoid O(n)
-    if let articleIndex = articles.firstIndex(where: { $0.id == id }) {
-      articles[articleIndex].isFavorite.toggle()
-      saveArticleFavoriteDataToStorage()
-    }
+    articleFavorites[id, default: false].toggle()
+    saveArticleFavoriteDataToStorage()
   }
 }
 
@@ -137,7 +125,7 @@ struct ArticleRow: View {
           .font(.caption)
       }
       Spacer()
-      Button("", systemImage: article.isFavorite ? "star.fill" : "star") {
+      Button("", systemImage: viewModel.isFavorite(article: article) ? "star.fill" : "star") {
         viewModel.toggleFavorite(forArticleWithId: article.id)
       }
     }
