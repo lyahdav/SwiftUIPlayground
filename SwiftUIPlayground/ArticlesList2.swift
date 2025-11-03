@@ -99,8 +99,12 @@ struct ArticlesList2 {
     }
   }
 
-  struct ArticleListView: View {
+  struct ArticleListView: View, CustomTitleConforming {
     @State private var viewModel = ArticleViewModel()
+
+    var title: String {
+        "ArticlesList2"
+    }
 
     var body: some View {
       NavigationStack {
