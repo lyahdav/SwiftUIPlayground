@@ -76,6 +76,7 @@ class ArticlesViewModel {
     if let articleIndex = articles.firstIndex(where: { $0.id == id }) {
       articles[articleIndex].isFavorite.toggle()
       saveArticleFavoriteDataToStorage()
+      onUpdateFilter()
     }
   }
 
@@ -102,10 +103,14 @@ struct ArticlesList: View {
         }
       }
       .pickerStyle(.segmented)
-      .onChange(of: viewModel.selectedFilter) { viewModel.onUpdateFilter() }
+      .onChange(of: viewModel.selectedFilter, viewModel.onUpdateFilter)
       switch viewModel.state {
       case .loading:
-        ProgressView()
+        VStack {
+          Spacer()
+          ProgressView()
+          Spacer()
+        }
       case .error(let error):
         Text("Error: \(error.localizedDescription)")
       case .loaded:
