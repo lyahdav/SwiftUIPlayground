@@ -28,6 +28,7 @@ struct ExamplesList: View {
     makeAnyView(view: DeepNavigationExample()),
     makeAnyView(view: GitHubAPIExample()),
     makeAnyView(view: AsyncImageExampleView()),
+    makeAnyView(view: ArticlesList())
   ]
 
   var body: some View {
