@@ -103,30 +103,27 @@ struct ArticlesList2 {
     @State private var viewModel = ArticleViewModel()
 
     var title: String {
-        "ArticlesList2"
+      "ArticlesList2"
     }
 
     var body: some View {
-      NavigationStack {
-        VStack {
-          Picker("Filter", selection: $viewModel.filter) {
-            ForEach(ArticleViewModel.Filter.allCases, id: \.self) { filter in
-              Text(filter.rawValue).tag(filter)
-            }
+      VStack {
+        Picker("Filter", selection: $viewModel.filter) {
+          ForEach(ArticleViewModel.Filter.allCases, id: \.self) { filter in
+            Text(filter.rawValue).tag(filter)
           }
-          .pickerStyle(.segmented)
-          .padding()
-
-          List(viewModel.filteredArticles) { article in
-            ArticleRow(
-              article: article,
-              isFavorite: viewModel.isFavorite(article),
-              toggleFavorite: { viewModel.toggleFavorite(for: article) }
-            )
-          }
-          .listStyle(.plain)
         }
-        .navigationTitle("Articles")
+        .pickerStyle(.segmented)
+        .padding()
+
+        List(viewModel.filteredArticles) { article in
+          ArticleRow(
+            article: article,
+            isFavorite: viewModel.isFavorite(article),
+            toggleFavorite: { viewModel.toggleFavorite(for: article) }
+          )
+        }
+        .listStyle(.plain)
       }
     }
   }
