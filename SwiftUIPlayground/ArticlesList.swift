@@ -1,14 +1,27 @@
 import SwiftUI
 
+enum ArticlesListError: String, Error {
+  case networkError = "Network error, try again"
+}
+
 struct Article: Identifiable {
   let id: String
   let title: String
   let summary: String
 }
 
-class ArticlesService {
+protocol ArticlesServiceProtocol {
+  func fetchArticles() async throws -> [Article]
+}
+
+class MockErrorArticlesService: ArticlesServiceProtocol {
   func fetchArticles() async throws -> [Article] {
-    // TODO: add error case
+    throw ArticlesListError.networkError
+  }
+}
+
+class ArticlesService: ArticlesServiceProtocol {
+  func fetchArticles() async throws -> [Article] {
     try await Task.sleep(nanoseconds: 1_000_000_000)
     return Array(1...20).map {
       Article(id: String($0), title: "Title \($0)", summary: "Summary \($0)")
@@ -25,7 +38,7 @@ enum ArticlesListState {
 
 @Observable
 class ArticlesViewModel {
-  let articlesService = ArticlesService()
+  let articlesService: ArticlesServiceProtocol
   var state: ArticlesListState = .loading
   var selectedFilter: Filter = .all
   var articleFavorites: [String: Bool] = [:]
@@ -40,10 +53,14 @@ class ArticlesViewModel {
     }
   }
 
-  @ObservationIgnored @AppStorage("articleFavoriteData") private var articleFavoriteData = Data()
+  @ObservationIgnored @AppStorage("articleFavoriteData") private var articleFavoritesData = Data()
+
+  init(articlesService: ArticlesServiceProtocol = ArticlesService()) {
+    self.articlesService = articlesService
+  }
 
   func getArticleFavorites() -> [String: Bool] {
-    if let decoded = try? JSONDecoder().decode([String: Bool].self, from: articleFavoriteData) {
+    if let decoded = try? JSONDecoder().decode([String: Bool].self, from: articleFavoritesData) {
       return decoded
     }
     return [:]  // default empty dictionary
@@ -51,7 +68,7 @@ class ArticlesViewModel {
 
   private func saveArticleFavoriteDataToStorage() {
     if let encoded = try? JSONEncoder().encode(articleFavorites) {
-      articleFavoriteData = encoded
+      articleFavoritesData = encoded
     }
   }
 
@@ -73,6 +90,18 @@ class ArticlesViewModel {
     articleFavorites[id, default: false].toggle()
     saveArticleFavoriteDataToStorage()
   }
+
+  func errorTextFor(_ error: Error) -> String {
+    let details = {
+      if let error = error as? ArticlesListError {
+        error.rawValue
+      } else {
+        error.localizedDescription
+      }
+    }()
+
+    return "⚠️ Error:\n\(details)"
+  }
 }
 
 enum Filter: String, CaseIterable {
@@ -81,7 +110,11 @@ enum Filter: String, CaseIterable {
 }
 
 struct ArticlesList: View {
-  @State private var viewModel = ArticlesViewModel()
+  @State private var viewModel: ArticlesViewModel
+
+  init(initialViewModel: ArticlesViewModel = ArticlesViewModel()) {
+    _viewModel = State(initialValue: initialViewModel)
+  }
 
   var body: some View {
     VStack {
@@ -99,7 +132,13 @@ struct ArticlesList: View {
           Spacer()
         }
       case .error(let error):
-        Text("Error: \(error.localizedDescription)")
+        VStack(alignment: .center) {
+          Spacer()
+          Text(viewModel.errorTextFor(error))
+            .multilineTextAlignment(.center)
+          Spacer()
+        }
+
       case .loaded:
         List(viewModel.filteredArticles) { article in
           ArticleRow(article: article, viewModel: viewModel)
@@ -134,4 +173,8 @@ struct ArticleRow: View {
 
 #Preview {
   ArticlesList()
+}
+
+#Preview {
+  ArticlesList(initialViewModel: ArticlesViewModel(articlesService: MockErrorArticlesService()))
 }
