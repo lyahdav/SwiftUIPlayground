@@ -1,5 +1,4 @@
 import SwiftUI
-internal import Combine
 
 struct GitHubAPIExample: View, CustomTitleConforming {
 
@@ -101,8 +100,9 @@ struct GitHubAPIExample: View, CustomTitleConforming {
     }
 }
 
-class TimerViewModel: ObservableObject {
-    @Published var seconds = 0
+@Observable
+class TimerViewModel {
+    var seconds = 0
     
     init() {
         // Start a timer that increments every second
@@ -113,16 +113,16 @@ class TimerViewModel: ObservableObject {
 }
 
 struct TimerLabel: View {
-    @ObservedObject var viewModel: TimerViewModel
-    
+    let viewModel: TimerViewModel
+
     var body: some View {
         Text("Seconds: \(viewModel.seconds)")
     }
 }
 
 struct TimerView: View {
-    @StateObject private var viewModel = TimerViewModel()
-    
+    @State private var viewModel = TimerViewModel()
+
     var body: some View {
         TimerLabel(viewModel: viewModel)
     }
